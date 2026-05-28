@@ -1,0 +1,41 @@
+{
+  "users": [
+    {
+      "email": "owner@geprek.com",
+      "password": "owner123",
+      "role": "owner"
+    },
+    {
+      "email": "karyawan@geprek.com",
+      "password": "karyawan123",
+      "role": "karyawan"
+    }
+  ],
+  "menus": [
+    {
+      "id": 1,
+      "name": "Ayam Geprek",
+      "stock": 50,
+      "price": 15000
+    },
+    {
+      "id": 2,
+      "name": "Es Teh",
+      "stock": 100,
+      "price": 5000
+    },
+    {
+      "id": 3,
+      "name": "Nasi Uduk",
+      "stock": 30,
+      "price": 8000
+    },
+    {
+      "id": 4,
+      "name": "Sambal",
+      "stock": 200,
+      "price": 2000
+    }
+  ],
+  "transactions": []
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Karyawan Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        .dashboard { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #ff6600; }
+        .logout { float: right; background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card h2 { margin-bottom: 15px; border-left: 4px solid #ff6600; padding-left: 10px; }
+        select, input, button { padding: 10px; margin: 5px; }
+        select, input { border: 1px solid #ddd; border-radius: 5px; width: 200px; }
+        button { background: #ff6600; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .warning { color: red; font-weight: bold; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>👨‍🍳 Karyawan Dashboard - Geprek Londho</h1>
+        <button class="logout" onclick="logout()">Logout</button>
+        <div class="card">
+            <h2>🛒 Input Transaksi</h2>
+            <select id="menuSelect"></select>
+            <input type="number" id="qty" placeholder="Jumlah">
+            <button onclick="addTransaction()">Simpan Transaksi</button>
+        </div>
+        <div class="card">
+            <h2>📦 Stok Hari Ini</h2>
+            <div id="stockInfo">Loading...</div>
+        </div>
+        <div class="card">
+            <h2>📜 Transaksi Hari Ini</h2>
+            <div id="todayTransactions">Loading...</div>
+        </div>
+    </div>
+    <script>
+        let currentData = {};
+        async function loadData() {
+            const res = await fetch('/api/data');
+            currentData = await res.json();
+            loadMenuSelect();
+            displayStock();
+            displayTodayTransactions();
+        }
+        function loadMenuSelect() {
+            const select = document.getElementById('menuSelect');
+            select.innerHTML = '<option value="">Pilih Menu</option>';
+            currentData.menus.forEach(menu => {
+                const option = document.createElement('option');
+                option.value = menu.id;
+                option.textContent = `${menu.name} - Stok: ${menu.stock} - Rp ${menu.price.toLocaleString()}`;
+                if (menu.stock <= 0) option.disabled = true;
+                select.appendChild(option);
+            });
+        }
+        function displayStock() {
+            let html = ' <table> <tr><th>Menu</th><th>Stok</th><th>Status</th></tr>';
+            currentData.menus.forEach(menu => {
+                const status = menu.stock <= 10 ? '<span class="warning">⚠️ Stok Menipis</span>' : '<span class="success">✅ Tersedia</span>';
+                html += `<tr><td>${menu.name}</td><td>${menu.stock}</td><td>${status}</td></tr>`;
+            });
+            html += '</table>';
+            document.getElementById('stockInfo').innerHTML = html;
+        }
+        function displayTodayTransactions() {
+            const today = new Date().toDateString();
+            const todayTransactions = currentData.transactions.filter(t => new Date(t.time).toDateString() === today);
+            if (todayTransactions.length === 0) {
+                document.getElementById('todayTransactions').innerHTML = '<p>Belum ada transaksi hari ini</p>';
+                return;
+            }
+            let html = ' <table> <tr><th>Menu</th><th>Jumlah</th><th>Total</th><th>Waktu</th></tr>';
+            todayTransactions.slice().reverse().forEach(t => {
+                const menu = currentData.menus.find(m => m.id === t.menuId);
+                if (menu) {
+                    html += `<tr><td>${menu.name}</td><td>${t.qty}</td><td>Rp ${(menu.price * t.qty).toLocaleString()}</td><td>${new Date(t.time).toLocaleTimeString()}</td></tr>`;
+                }
+            });
+            html += '</table>';
+            document.getElementById('todayTransactions').innerHTML = html;
+        }
+        async function addTransaction() {
+            const menuId = parseInt(document.getElementById('menuSelect').value);
+            const qty = parseInt(document.getElementById('qty').value);
+            if (!menuId || !qty || qty <= 0) { alert('Pilih menu dan masukkan jumlah yang valid'); return; }
+            const menu = currentData.menus.find(m => m.id === menuId);
+            if (!menu || menu.stock < qty) { alert('Stok tidak mencukupi!'); return; }
+            const res = await fetch('/api/transaction', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ menuId, qty }) });
+            const result = await res.json();
+            if (result.success) { alert('Transaksi berhasil disimpan'); document.getElementById('qty').value = ''; loadData(); } 
+            else { alert(result.message); }
+        }
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        if (localStorage.getItem('role') !== 'karyawan') { window.location.href = 'index.html'; }
+        else { loadData(); setInterval(loadData, 5000); }
+    </script>
+</body>
+</html>

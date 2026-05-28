@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Cloud Data Safety</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .login-container {
+            width: 350px;
+            margin: 100px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .login-container h2 { text-align: center; color: #ff6600; }
+        .login-container h3 { text-align: center; font-size: 14px; color: #666; margin-bottom: 20px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover { background: #e55a00; }
+        .error { color: red; text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>☁️ Cloud Data Safety</h2>
+        <h3>Warung Geprek "Geprek Londho"</h3>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="errorMsg" class="error"></p>
+    </div>
+    <script>
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const result = await res.json();
+            if (result.success) {
+                localStorage.setItem('role', result.role);
+                if (result.role === 'owner') location.href = 'dashboard-owner.html';
+                else location.href = 'dashboard-karyawan.html';
+            } else {
+                document.getElementById('errorMsg').innerText = result.message;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -2,97 +2,568 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Owner Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard - Cloud Data Safety</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-        .dashboard { max-width: 1200px; margin: 0 auto; }
-        h1 { color: #ff6600; }
-        .logout { float: right; background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-        .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .card h2 { margin-bottom: 15px; border-left: 4px solid #ff6600; padding-left: 10px; }
-        input, button { padding: 10px; margin: 5px; }
-        input { border: 1px solid #ddd; border-radius: 5px; width: 200px; }
-        button { background: #ff6600; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #f8f9fa; }
-        .stock-btn { background: #28a745; padding: 5px 10px; font-size: 12px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f3f4f6;
+            transition: all 0.3s ease;
+        }
+
+        body.dark {
+            background: #111827;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        body.dark .navbar {
+            background: #1f2937;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon i {
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        body.dark .logo-text h2 {
+            color: #f3f4f6;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .dark-toggle, .logout-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .dark-toggle {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        body.dark .dark-toggle {
+            background: #374151;
+            color: #f3f4f6;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        body.dark .stat-card {
+            background: #1f2937;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-info h3 {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .stat-info .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        body.dark .stat-info .value {
+            color: #f3f4f6;
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon i {
+            font-size: 28px;
+            color: #667eea;
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        body.dark .card {
+            background: #1f2937;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        body.dark .card-header h2 {
+            color: #f3f4f6;
+        }
+
+        .card-header i {
+            color: #667eea;
+            margin-right: 8px;
+        }
+
+        /* Form */
+        .form-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .form-group input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body.dark .form-group input {
+            background: #374151;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        body.dark th, body.dark td {
+            border-bottom-color: #374151;
+            color: #f3f4f6;
+        }
+
+        th {
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .stock-btn {
+            background: #10b981;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .stock-btn:hover {
+            background: #059669;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #10b98120;
+            color: #10b981;
+        }
+
+        body.dark .badge-success {
+            background: #10b98130;
+        }
+
+        .search-input {
+            padding: 10px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            width: 250px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body.dark .search-input {
+            background: #374151;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <h1>🏪 Owner Dashboard - Geprek Londho</h1>
-        <button class="logout" onclick="logout()">Logout</button>
-        <div class="card">
-            <h2>➕ Tambah Menu Baru</h2>
-            <input type="text" id="menuName" placeholder="Nama Menu">
-            <input type="number" id="menuStock" placeholder="Stok">
-            <input type="number" id="menuPrice" placeholder="Harga">
-            <button onclick="addMenu()">Tambah Menu</button>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <div class="logo-text">
+                <h2>Cloud Data Safety</h2>
+                <p>Warung Geprek Londho</p>
+            </div>
         </div>
-        <div class="card">
-            <h2>📦 Manajemen Stok</h2>
-            <div id="stockList">Loading...</div>
+        <div class="nav-actions">
+            <button class="dark-toggle" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
+    </nav>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3><i class="fas fa-utensils"></i> Total Menu</h3>
+                    <div class="value" id="totalMenu">0</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3><i class="fas fa-boxes"></i> Total Stok</h3>
+                    <div class="value" id="totalStock">0</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3><i class="fas fa-shopping-cart"></i> Transaksi Hari Ini</h3>
+                    <div class="value" id="todaySales">0</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3><i class="fas fa-chart-line"></i> Total Penjualan</h3>
+                    <div class="value" id="totalSales">0</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Menu -->
         <div class="card">
-            <h2>📊 Data Penjualan</h2>
-            <div id="salesList">Loading...</div>
+            <div class="card-header">
+                <h2><i class="fas fa-plus-circle"></i> Tambah Menu Baru</h2>
+            </div>
+            <div class="form-group">
+                <input type="text" id="menuName" placeholder="Nama Menu">
+                <input type="number" id="menuStock" placeholder="Stok">
+                <input type="number" id="menuPrice" placeholder="Harga">
+                <button class="btn-primary" onclick="addMenu()">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
+        </div>
+
+        <!-- Stock Management -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-boxes"></i> Manajemen Stok</h2>
+                <input type="text" class="search-input" id="searchStock" placeholder="🔍 Cari menu..." onkeyup="filterStock()">
+            </div>
+            <div class="table-wrapper">
+                <table id="stockTable">
+                    <thead>
+                        <tr><th>Menu</th><th>Stok</th><th>Harga</th><th>Status</th><th>Aksi</th></tr>
+                    </thead>
+                    <tbody id="stockBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sales Data -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-line"></i> Data Penjualan</h2>
+            </div>
+            <div class="table-wrapper">
+                <table id="salesTable">
+                    <thead><tr><th>Menu</th><th>Jumlah</th><th>Total</th><th>Waktu</th></tr></thead>
+                    <tbody id="salesBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
+
     <script>
         let currentData = {};
+        let stockFilter = '';
+
         async function loadData() {
             const res = await fetch('/api/data');
             currentData = await res.json();
+            updateStats();
             displayStock();
             displaySales();
         }
-        function displayStock() {
-            let html = ' <table> <tr><th>Menu</th><th>Stok</th><th>Harga</th><th>Aksi</th></tr>';
-            currentData.menus.forEach(menu => {
-                html += `<tr><td>${menu.name}</td><td>${menu.stock}</td><td>Rp ${menu.price.toLocaleString()}</td><td><button class="stock-btn" onclick="updateStock(${menu.id})">Update Stok</button></td></tr>`;
-            });
-            html += '</table>';
-            document.getElementById('stockList').innerHTML = html;
+
+        function updateStats() {
+            document.getElementById('totalMenu').textContent = currentData.menus.length;
+            const totalStock = currentData.menus.reduce((sum, m) => sum + m.stock, 0);
+            document.getElementById('totalStock').textContent = totalStock;
+            
+            const today = new Date().toDateString();
+            const todayTrans = currentData.transactions.filter(t => new Date(t.time).toDateString() === today);
+            document.getElementById('todaySales').textContent = todayTrans.length;
+            document.getElementById('totalSales').textContent = currentData.transactions.length;
         }
-        function displaySales() {
-            if (!currentData.transactions || currentData.transactions.length === 0) {
-                document.getElementById('salesList').innerHTML = '<p>Belum ada transaksi</p>';
-                return;
+
+        function displayStock() {
+            let filtered = currentData.menus;
+            if (stockFilter) {
+                filtered = filtered.filter(m => m.name.toLowerCase().includes(stockFilter.toLowerCase()));
             }
-            let html = ' <table> <tr><th>Menu</th><th>Jumlah</th><th>Total</th><th>Waktu</th></tr>';
-            currentData.transactions.slice().reverse().forEach(t => {
+            const tbody = document.getElementById('stockBody');
+            tbody.innerHTML = '';
+            filtered.forEach(menu => {
+                const status = menu.stock <= 10 ? '<span class="badge badge-warning" style="background:#f59e0b20;color:#f59e0b;">⚠️ Menipis</span>' : '<span class="badge badge-success">✅ Aman</span>';
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = menu.name;
+                row.insertCell(1).textContent = menu.stock;
+                row.insertCell(2).textContent = `Rp ${menu.price.toLocaleString()}`;
+                row.insertCell(3).innerHTML = status;
+                row.insertCell(4).innerHTML = `<button class="stock-btn" onclick="updateStock(${menu.id})"><i class="fas fa-edit"></i> Update</button>`;
+            });
+        }
+
+        function displaySales() {
+            const tbody = document.getElementById('salesBody');
+            tbody.innerHTML = '';
+            const reversed = [...currentData.transactions].reverse();
+            reversed.slice(0, 50).forEach(t => {
                 const menu = currentData.menus.find(m => m.id === t.menuId);
                 if (menu) {
-                    html += `<tr><td>${menu.name}</td><td>${t.qty}</td><td>Rp ${(menu.price * t.qty).toLocaleString()}</td><td>${new Date(t.time).toLocaleString()}</td></tr>`;
+                    const row = tbody.insertRow();
+                    row.insertCell(0).textContent = menu.name;
+                    row.insertCell(1).textContent = t.qty;
+                    row.insertCell(2).textContent = `Rp ${(menu.price * t.qty).toLocaleString()}`;
+                    row.insertCell(3).textContent = new Date(t.time).toLocaleString();
                 }
             });
-            html += '</table>';
-            document.getElementById('salesList').innerHTML = html;
         }
+
+        function filterStock() {
+            stockFilter = document.getElementById('searchStock').value;
+            displayStock();
+        }
+
         async function addMenu() {
             const name = document.getElementById('menuName').value;
             const stock = document.getElementById('menuStock').value;
             const price = document.getElementById('menuPrice').value;
-            if (!name || !stock || !price) { alert('Isi semua field'); return; }
-            await fetch('/api/menu', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, stock: parseInt(stock), price: parseInt(price) }) });
-            alert('Menu berhasil ditambahkan');
+            if (!name || !stock || !price) {
+                alert('Isi semua field!');
+                return;
+            }
+            await fetch('/api/menu', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, stock: parseInt(stock), price: parseInt(price) })
+            });
+            alert('Menu berhasil ditambahkan!');
             document.getElementById('menuName').value = '';
             document.getElementById('menuStock').value = '';
             document.getElementById('menuPrice').value = '';
             loadData();
         }
+
         async function updateStock(menuId) {
             const newStock = prompt('Masukkan stok baru:');
             if (newStock !== null) {
-                await fetch('/api/updatestock', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ menuId, newStock: parseInt(newStock) }) });
+                await fetch('/api/updatestock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ menuId, newStock: parseInt(newStock) })
+                });
                 loadData();
             }
         }
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
-        if (localStorage.getItem('role') !== 'owner') { window.location.href = 'index.html'; }
-        else { loadData(); setInterval(loadData, 5000); }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+        }
+
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark');
+        }
+
+        if (localStorage.getItem('role') !== 'owner') {
+            window.location.href = 'index.html';
+        } else {
+            loadData();
+            setInterval(loadData, 10000);
+        }
     </script>
 </body>
 </html>

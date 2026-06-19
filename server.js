@@ -48,7 +48,7 @@ app.get('/dashboard-owner', (req, res) => {
 });
 
 app.get('/dashboard-karyawan', (req, res) => {
-    res.sendFile(__dirname + '/public/dashboard-karyawan.html');
+    res.sendFile(__dirname + '/public//dashboard-karyawan');
 });
 
 // ======= API ENDPOINTS =======

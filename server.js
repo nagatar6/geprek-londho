@@ -38,6 +38,20 @@ function saveData(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
+// ======= ROUTING TANPA .html =======
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
+});
+
+app.get('/dashboard-owner', (req, res) => {
+    res.sendFile(__dirname + '/public/dashboard-owner.html');
+});
+
+app.get('/dashboard-karyawan', (req, res) => {
+    res.sendFile(__dirname + '/public/dashboard-karyawan.html');
+});
+
+// ======= API ENDPOINTS =======
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
     const data = loadData();
@@ -95,6 +109,7 @@ app.post('/api/updatestock', (req, res) => {
     }
 });
 
+// ======= START SERVER =======
 app.listen(PORT, () => {
     console.log(`
     ╔════════════════════════════════════════╗

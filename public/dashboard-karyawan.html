@@ -79,28 +79,45 @@
         }
         
         .container { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
-        
-        #stockAlert {
-            display: none;
-            border-radius: 16px;
-            padding: 16px 24px;
+
+        /* STOCK NOTIFICATION AREA */
+        .stock-notification {
             margin-bottom: 24px;
-            animation: slideDown 0.4s ease;
         }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .stock-notification .alert {
+            padding: 12px 18px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        #stockAlert.danger { background: #fee2e2; border-left: 4px solid #dc2626; }
-        #stockAlert.warning { background: #fef3c7; border-left: 4px solid #f59e0b; }
-        #stockAlert.success { background: #d1fae5; border-left: 4px solid #10b981; }
-        .alert-content { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .alert-icon { font-size: 24px; }
-        .alert-title { font-weight: 600; }
-        #stockAlert.danger .alert-title { color: #dc2626; }
-        #stockAlert.warning .alert-title { color: #f59e0b; }
-        #stockAlert.success .alert-title { color: #10b981; }
-        .alert-message { color: #6b7280; margin: 0; }
+        .stock-notification .alert-danger {
+            border-left: 6px solid #dc3545;
+            color: #721c24;
+        }
+        .stock-notification .alert-warning {
+            border-left: 6px solid #ffc107;
+            color: #856404;
+        }
+        .stock-notification .alert-success {
+            border-left: 6px solid #28a745;
+            color: #155724;
+        }
+        .stock-notification .alert i {
+            font-size: 20px;
+        }
+        .stock-notification .alert strong {
+            font-weight: 600;
+        }
+        body.dark .stock-notification .alert {
+            background: rgba(30, 30, 40, 0.95);
+            color: #f0f0f0;
+        }
         
         .stats-grid {
             display: grid;
@@ -188,11 +205,14 @@
         .badge-success { background: #10b98120; color: #10b981; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .badge-warning { background: #f59e0b20; color: #f59e0b; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .badge-danger { background: #dc262620; color: #dc2626; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-        
+
+        /* TOAST NOTIF DI BAWAH */
         .toast-notif {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+            position: fixed !important;
+            bottom: 30px !important;
+            right: 20px !important;
+            top: auto !important;
+            left: auto !important;
             background: white;
             border-radius: 16px;
             padding: 16px 24px;
@@ -200,8 +220,9 @@
             align-items: center;
             gap: 12px;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
-            z-index: 1000;
+            z-index: 9999;
             animation: slideIn 0.3s ease;
+            max-width: 90%;
         }
         .toast-notif.success { border-left: 4px solid #10b981; }
         .toast-notif.error { border-left: 4px solid #dc2626; }
@@ -219,7 +240,7 @@
         .toast-notif .toast-message { font-size: 14px; font-weight: 500; color: #1f2937; }
         body.dark .toast-notif { background: #1f2937; }
         body.dark .toast-notif .toast-message { color: #f3f4f6; }
-        
+
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -233,6 +254,7 @@
         @media (max-width: 768px) {
             .container { padding: 16px; }
             .form-group { flex-direction: column; }
+            .toast-notif { bottom: 10px; right: 10px; left: 10px; max-width: 100%; }
         }
     </style>
 </head>
@@ -249,15 +271,8 @@
     </nav>
 
     <div class="container">
-        <div id="stockAlert">
-            <div class="alert-content">
-                <span class="alert-icon">⚠️</span>
-                <div>
-                    <div class="alert-title">Stok Menipis!</div>
-                    <p class="alert-message" id="alertMessage">Beberapa menu hampir habis. Segera restok!</p>
-                </div>
-            </div>
-        </div>
+        <!-- NOTIFIKASI STOK -->
+        <div id="stockNotification" class="stock-notification"></div>
 
         <div class="stats-grid">
             <div class="stat-card">
@@ -298,6 +313,7 @@
         let currentData = {};
         let selectedMenuId = '';
 
+        // Toast notifikasi (di bawah)
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast-notif ${type}`;
@@ -313,26 +329,46 @@
             }, 4000);
         }
 
-        function updateStockAlert() {
-            const alertDiv = document.getElementById('stockAlert');
-            const alertMsg = document.getElementById('alertMessage');
+        // SHOW STOCK NOTIFICATION (di area dashboard, bukan pop-up spam)
+        function showStockNotification() {
+            const container = document.getElementById('stockNotification');
+            if (!container) return;
+            container.innerHTML = '';
+            if (!currentData.menus) return;
+
             const emptyStock = currentData.menus.filter(m => m.stock === 0);
             const lowStock = currentData.menus.filter(m => m.stock > 0 && m.stock <= 10);
-            
+
             if (emptyStock.length > 0) {
-                alertDiv.className = 'danger';
-                alertDiv.style.display = 'block';
-                const names = emptyStock.map(m => m.name).join(', ');
-                alertMsg.textContent = `🚨 ${emptyStock.length} menu HABIS: ${names}. Segera restok!`;
-                showToast(`🚨 ${emptyStock.length} menu habis!`, 'error');
-            } else if (lowStock.length > 0) {
-                alertDiv.className = 'warning';
-                alertDiv.style.display = 'block';
-                const names = lowStock.map(m => m.name).join(', ');
-                alertMsg.textContent = `⚠️ ${lowStock.length} menu menipis: ${names}. Segera restok!`;
-                showToast(`⚠️ ${lowStock.length} menu menipis!`, 'warning');
-            } else {
-                alertDiv.style.display = 'none';
+                const warning = document.createElement('div');
+                warning.className = 'alert alert-danger';
+                warning.innerHTML = `
+                    <i class="fas fa-times-circle"></i>
+                    <strong>${emptyStock.length} menu HABIS!</strong>
+                    <span>${emptyStock.map(m => m.name).join(', ')}</span>
+                `;
+                container.appendChild(warning);
+            }
+
+            if (lowStock.length > 0) {
+                const warning = document.createElement('div');
+                warning.className = 'alert alert-warning';
+                warning.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>${lowStock.length} menu MENIPIS!</strong>
+                    <span>${lowStock.map(m => m.name).join(', ')}</span>
+                `;
+                container.appendChild(warning);
+            }
+
+            if (emptyStock.length === 0 && lowStock.length === 0) {
+                const info = document.createElement('div');
+                info.className = 'alert alert-success';
+                info.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Semua stok aman.</strong>
+                `;
+                container.appendChild(info);
             }
         }
 
@@ -344,13 +380,15 @@
                 loadMenuSelect();
                 displayStock();
                 displayTodayTransactions();
-                updateStockAlert();
+                showStockNotification(); // Tampilkan notifikasi stok
             } catch (err) {
                 console.error('Gagal load data:', err);
+                showToast('Gagal memuat data', 'error');
             }
         }
 
         function updateStats() {
+            if (!currentData.menus) return;
             document.getElementById('totalMenu').textContent = currentData.menus.length;
             const low = currentData.menus.filter(m => m.stock <= 10).length;
             document.getElementById('lowStock').textContent = low;
@@ -361,7 +399,6 @@
 
         function loadMenuSelect() {
             const select = document.getElementById('menuSelect');
-            // Simpan pilihan sebelumnya
             const currentValue = select.value;
             
             select.innerHTML = '<option value="">Pilih Menu</option>';
@@ -373,7 +410,6 @@
                 select.appendChild(option);
             });
             
-            // Kembalikan pilihan jika masih ada
             if (currentValue) {
                 const exists = Array.from(select.options).some(opt => opt.value === currentValue);
                 if (exists && !select.querySelector(`option[value="${currentValue}"]`).disabled) {
@@ -385,6 +421,7 @@
         function displayStock() {
             const tbody = document.getElementById('stockBody');
             tbody.innerHTML = '';
+            if (!currentData.menus) return;
             currentData.menus.forEach(menu => {
                 let badge = '';
                 if (menu.stock === 0) badge = '<span class="badge-danger">🔴 HABIS</span>';
@@ -402,6 +439,7 @@
             const todayTrans = currentData.transactions.filter(t => new Date(t.time).toDateString() === today);
             const tbody = document.getElementById('transBody');
             tbody.innerHTML = '';
+            if (!todayTrans) return;
             todayTrans.slice().reverse().forEach(t => {
                 const menu = currentData.menus.find(m => m.id === t.menuId);
                 if (menu) {
@@ -435,8 +473,7 @@
             if (result.success) {
                 showToast('✅ Transaksi berhasil disimpan!', 'success');
                 document.getElementById('qty').value = '';
-                // Refresh data tanpa reset pilihan menu
-                await loadData();
+                loadData();
             } else {
                 showToast(result.message, 'error');
             }
@@ -455,7 +492,7 @@
             window.location.href = 'index.html';
         } else {
             loadData();
-            // Refresh setiap 30 detik (ga ganggu pilihan menu)
+            // refresh setiap 30 detik (bukan 5 detik, biar ga spam)
             setInterval(loadData, 30000);
         }
     </script>

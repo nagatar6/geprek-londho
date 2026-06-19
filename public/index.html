@@ -152,7 +152,6 @@
             transform: translateY(0);
         }
 
-        /* Spinner loading */
         .spinner {
             display: inline-block;
             width: 20px;
@@ -168,11 +167,12 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Toast Notifikasi */
         .toast-notif {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+            position: fixed !important;
+            bottom: 30px !important;
+            right: 20px !important;
+            top: auto !important;
+            left: auto !important;
             background: white;
             border-radius: 16px;
             padding: 16px 24px;
@@ -180,17 +180,13 @@
             align-items: center;
             gap: 12px;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
-            z-index: 1000;
+            z-index: 9999;
             animation: slideIn 0.3s ease;
+            max-width: 90%;
         }
 
-        .toast-notif.success {
-            border-left: 4px solid #10b981;
-        }
-
-        .toast-notif.error {
-            border-left: 4px solid #dc2626;
-        }
+        .toast-notif.success { border-left: 4px solid #10b981; }
+        .toast-notif.error { border-left: 4px solid #dc2626; }
 
         .toast-notif .toast-icon {
             width: 32px;
@@ -201,15 +197,8 @@
             justify-content: center;
         }
 
-        .toast-notif.success .toast-icon {
-            background: #10b98120;
-            color: #10b981;
-        }
-
-        .toast-notif.error .toast-icon {
-            background: #dc262620;
-            color: #dc2626;
-        }
+        .toast-notif.success .toast-icon { background: #10b98120; color: #10b981; }
+        .toast-notif.error .toast-icon { background: #dc262620; color: #dc2626; }
 
         .toast-notif .toast-message {
             font-size: 14px;
@@ -218,32 +207,17 @@
         }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
 
-        .toast-notif.hide {
-            animation: slideOut 0.3s ease forwards;
-        }
+        .toast-notif.hide { animation: slideOut 0.3s ease forwards; }
 
-        /* Modal Centang Hijau */
         .success-modal {
             position: fixed;
             top: 0;
@@ -301,38 +275,22 @@
         }
 
         @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.05);
-            }
-            70% {
-                transform: scale(0.9);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
         }
 
         @keyframes scaleCheck {
-            0% {
-                transform: scale(0);
-            }
-            50% {
-                transform: scale(1.2);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         .dark-mode-toggle {
             position: fixed;
             bottom: 20px;
-            right: 20px;
+            left: 20px;
             background: rgba(255, 255, 255, 0.9);
             border: none;
             border-radius: 50%;
@@ -391,15 +349,8 @@
         }
 
         @media (max-width: 480px) {
-            .login-card {
-                padding: 30px 20px;
-            }
-            .toast-notif {
-                top: auto;
-                bottom: 20px;
-                right: 20px;
-                left: 20px;
-            }
+            .login-card { padding: 30px 20px; }
+            .toast-notif { bottom: 20px; right: 10px; left: 10px; max-width: 100%; }
         }
     </style>
 </head>
@@ -441,7 +392,6 @@
     </button>
 
     <script>
-        // Fungsi toast notifikasi
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast-notif ${type}`;
@@ -461,7 +411,6 @@
             }, 3000);
         }
 
-        // Fungsi modal centang hijau
         function showSuccessModal(message, redirectUrl) {
             const modal = document.createElement('div');
             modal.className = 'success-modal';
@@ -476,7 +425,6 @@
             `;
             document.body.appendChild(modal);
             
-            // Redirect setelah 1.5 detik
             setTimeout(() => {
                 window.location.href = redirectUrl;
             }, 1500);
@@ -487,13 +435,11 @@
             const password = document.getElementById('password').value;
             const loginBtn = document.getElementById('loginBtn');
             
-            // Validasi input kosong
             if (!email || !password) {
                 showToast('Email dan password harus diisi!', 'error');
                 return;
             }
             
-            // Tampilkan loading
             const originalText = loginBtn.innerHTML;
             loginBtn.innerHTML = '<span class="spinner"></span> Memproses...';
             loginBtn.disabled = true;
@@ -510,10 +456,8 @@
                     localStorage.setItem('role', result.role);
                     localStorage.setItem('email', email);
                     
-                    // Toast notifikasi
                     showToast(`Halo ${result.role === 'owner' ? 'Owner' : 'Karyawan'}, login berhasil!`, 'success');
                     
-                    // Modal centang hijau & redirect
                     const redirectUrl = result.role === 'owner' ? 'dashboard-owner.html' : 'dashboard-karyawan.html';
                     showSuccessModal(`Selamat datang ${result.role === 'owner' ? 'Owner' : 'Karyawan'}!`, redirectUrl);
                 } else {
@@ -532,7 +476,6 @@
             document.body.classList.toggle('dark');
             const isDark = document.body.classList.contains('dark');
             localStorage.setItem('darkMode', isDark);
-            showToast(`Mode ${isDark ? 'gelap' : 'terang'} aktif`, 'success');
         }
 
         if (localStorage.getItem('darkMode') === 'true') {

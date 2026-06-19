@@ -15,7 +15,7 @@
     {
       "id": 1,
       "name": "Ayam Geprek",
-      "stock": 50,
+      "stock": 15,
       "price": 15000
     },
     {
@@ -37,5 +37,12 @@
       "price": 2000
     }
   ],
-  "transactions": []
+  "transactions": [
+    {
+      "id": 1781875469945,
+      "menuId": 1,
+      "qty": 50,
+      "time": "2026-06-19T13:24:29.945Z"
+    }
+  ]
 }

@@ -7,14 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: url('https://images.pexels.com/photos/28041446/pexels-photo-28041446.jpeg') no-repeat center center fixed;
@@ -22,8 +17,6 @@
             position: relative;
             transition: all 0.3s ease;
         }
-
-        /* Overlay gelap biar teks jelas */
         body::before {
             content: '';
             position: fixed;
@@ -34,16 +27,12 @@
             background: rgba(0, 0, 0, 0.55);
             z-index: -1;
         }
-
-        body.dark::before {
-            background: rgba(0, 0, 0, 0.75);
-        }
+        body.dark::before { background: rgba(0, 0, 0, 0.75); }
 
         /* Navbar */
         .navbar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             padding: 16px 32px;
             display: flex;
             justify-content: space-between;
@@ -52,165 +41,93 @@
             top: 0;
             z-index: 100;
         }
-
-        body.dark .navbar {
-            background: rgba(31, 41, 55, 0.95);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        body.dark .navbar { background: rgba(31, 41, 55, 0.95); }
+        .logo { display: flex; align-items: center; gap: 12px; }
         .logo-icon {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+        .logo-icon i { color: white; font-size: 20px; }
+        .logo-text h2 { font-size: 18px; font-weight: 600; color: #1f2937; }
+        body.dark .logo-text h2 { color: #f3f4f6; }
+        .logo-text p { font-size: 12px; color: #6b7280; }
 
-        .logo-icon i {
-            color: white;
-            font-size: 20px;
-        }
-
-        .logo-text h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2937;
-        }
-
-        body.dark .logo-text h2 {
-            color: #f3f4f6;
-        }
-
-        .logo-text p {
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
+        .nav-actions { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
         .dark-toggle, .logout-btn, .pdf-btn {
-            background: none;
             border: none;
-            font-size: 20px;
             cursor: pointer;
-            padding: 8px;
+            padding: 8px 16px;
             border-radius: 12px;
             transition: all 0.3s ease;
-        }
-
-        .dark-toggle {
-            background: #e5e7eb;
-            color: #374151;
-        }
-
-        body.dark .dark-toggle {
-            background: #374151;
-            color: #f3f4f6;
-        }
-
-        .pdf-btn {
-            background: #dc2626;
-            color: white;
-            font-size: 14px;
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
         }
-
-        .pdf-btn:hover {
-            background: #b91c1c;
-            transform: translateY(-2px);
-        }
-
-        .logout-btn {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            color: white;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
-        }
+        .dark-toggle { background: #e5e7eb; color: #374151; font-size: 20px; padding: 8px 12px; }
+        body.dark .dark-toggle { background: #374151; color: #f3f4f6; }
+        .pdf-btn { background: #dc2626; color: white; display: flex; align-items: center; gap: 8px; }
+        .pdf-btn:hover { background: #b91c1c; transform: translateY(-2px); }
+        .logout-btn { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; display: flex; align-items: center; gap: 8px; }
 
         /* Container */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px 32px;
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+
+        /* Alert Stok */
+        #stockAlert {
+            display: none;
+            border-radius: 16px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            animation: slideDown 0.4s ease;
         }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #stockAlert.danger { background: #fee2e2; border-left: 4px solid #dc2626; }
+        #stockAlert.warning { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        #stockAlert.success { background: #d1fae5; border-left: 4px solid #10b981; }
+        .alert-content { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .alert-icon { font-size: 24px; }
+        .alert-title { font-weight: 600; }
+        #stockAlert.danger .alert-title { color: #dc2626; }
+        #stockAlert.warning .alert-title { color: #f59e0b; }
+        #stockAlert.success .alert-title { color: #10b981; }
+        .alert-message { color: #6b7280; margin: 0; }
 
         /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 24px;
             margin-bottom: 32px;
         }
-
         .stat-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 24px;
-            padding: 24px;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: transform 0.3s ease;
-            cursor: pointer;
         }
-
-        body.dark .stat-card {
-            background: rgba(31, 41, 55, 0.95);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-        }
-
-        .stat-info h3 {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 8px;
-        }
-
-        .stat-info .value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #1f2937;
-        }
-
-        body.dark .stat-info .value {
-            color: #f3f4f6;
-        }
-
+        body.dark .stat-card { background: rgba(31, 41, 55, 0.95); }
+        .stat-card:hover { transform: translateY(-4px); }
+        .stat-info h3 { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+        .stat-info .value { font-size: 28px; font-weight: 700; color: #1f2937; }
+        body.dark .stat-info .value { color: #f3f4f6; }
         .stat-icon {
-            width: 56px;
-            height: 56px;
+            width: 48px; height: 48px;
             background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
-        .stat-icon i {
-            font-size: 28px;
-            color: #667eea;
-        }
+        .stat-icon i { font-size: 24px; color: #667eea; }
 
         /* Card */
         .card {
@@ -220,11 +137,7 @@
             padding: 24px;
             margin-bottom: 32px;
         }
-
-        body.dark .card {
-            background: rgba(31, 41, 55, 0.95);
-        }
-
+        body.dark .card { background: rgba(31, 41, 55, 0.95); }
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -233,29 +146,12 @@
             flex-wrap: wrap;
             gap: 16px;
         }
-
-        .card-header h2 {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1f2937;
-        }
-
-        body.dark .card-header h2 {
-            color: #f3f4f6;
-        }
-
-        .card-header i {
-            color: #667eea;
-            margin-right: 8px;
-        }
+        .card-header h2 { font-size: 20px; font-weight: 600; color: #1f2937; }
+        body.dark .card-header h2 { color: #f3f4f6; }
+        .card-header i { color: #667eea; margin-right: 8px; }
 
         /* Form */
-        .form-group {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
+        .form-group { display: flex; gap: 16px; flex-wrap: wrap; }
         .form-group input {
             flex: 1;
             padding: 12px 16px;
@@ -263,20 +159,10 @@
             border-radius: 16px;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
-            transition: all 0.3s ease;
             background: white;
         }
-
-        body.dark .form-group input {
-            background: #374151;
-            border-color: #4b5563;
-            color: #f3f4f6;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+        body.dark .form-group input { background: #374151; border-color: #4b5563; color: #f3f4f6; }
+        .form-group input:focus { outline: none; border-color: #667eea; }
 
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -288,37 +174,7 @@
             cursor: pointer;
             transition: transform 0.2s ease;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Table */
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 16px 12px;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        body.dark th, body.dark td {
-            border-bottom-color: #374151;
-            color: #f3f4f6;
-        }
-
-        th {
-            font-weight: 600;
-            color: #6b7280;
-            font-size: 13px;
-        }
+        .btn-primary:hover { transform: translateY(-2px); }
 
         .stock-btn {
             background: #10b981;
@@ -330,10 +186,7 @@
             font-size: 12px;
             transition: all 0.3s ease;
         }
-
-        .stock-btn:hover {
-            background: #059669;
-        }
+        .stock-btn:hover { background: #059669; }
 
         .badge {
             padding: 4px 12px;
@@ -341,15 +194,16 @@
             font-size: 12px;
             font-weight: 500;
         }
+        .badge-success { background: #10b98120; color: #10b981; }
+        .badge-warning { background: #f59e0b20; color: #f59e0b; }
+        .badge-danger { background: #dc262620; color: #dc2626; }
 
-        .badge-success {
-            background: #10b98120;
-            color: #10b981;
-        }
-
-        body.dark .badge-success {
-            background: #10b98130;
-        }
+        /* Table */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        body.dark th, body.dark td { border-bottom-color: #374151; color: #f3f4f6; }
+        th { font-weight: 600; color: #6b7280; font-size: 13px; }
 
         .search-input {
             padding: 10px 16px;
@@ -359,12 +213,7 @@
             font-family: 'Inter', sans-serif;
             background: white;
         }
-
-        body.dark .search-input {
-            background: #374151;
-            border-color: #4b5563;
-            color: #f3f4f6;
-        }
+        body.dark .search-input { background: #374151; border-color: #4b5563; color: #f3f4f6; }
 
         /* Toast */
         .toast-notif {
@@ -381,145 +230,92 @@
             z-index: 1000;
             animation: slideIn 0.3s ease;
         }
-
-        .toast-notif.success {
-            border-left: 4px solid #10b981;
-        }
-
+        .toast-notif.success { border-left: 4px solid #10b981; }
+        .toast-notif.error { border-left: 4px solid #dc2626; }
+        .toast-notif.warning { border-left: 4px solid #f59e0b; }
         .toast-notif .toast-icon {
-            width: 32px;
-            height: 32px;
+            width: 32px; height: 32px;
             border-radius: 50%;
-            background: #10b98120;
-            color: #10b981;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
-        .toast-notif .toast-message {
-            font-size: 14px;
-            font-weight: 500;
-            color: #1f2937;
-        }
+        .toast-notif.success .toast-icon { background: #10b98120; color: #10b981; }
+        .toast-notif.error .toast-icon { background: #dc262620; color: #dc2626; }
+        .toast-notif.warning .toast-icon { background: #f59e0b20; color: #f59e0b; }
+        .toast-notif .toast-message { font-size: 14px; font-weight: 500; color: #1f2937; }
+        body.dark .toast-notif { background: #1f2937; }
+        body.dark .toast-notif .toast-message { color: #f3f4f6; }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-
         @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
-
-        .toast-notif.hide {
-            animation: slideOut 0.3s ease forwards;
-        }
-
-        body.dark .toast-notif {
-            background: #1f2937;
-        }
-
-        body.dark .toast-notif .toast-message {
-            color: #f3f4f6;
-        }
+        .toast-notif.hide { animation: slideOut 0.3s ease forwards; }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .form-group {
-                flex-direction: column;
-            }
+            .container { padding: 16px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .form-group { flex-direction: column; }
+            .nav-actions { gap: 8px; }
+            .search-input { width: 100%; }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="logo">
-            <div class="logo-icon">
-                <i class="fas fa-cloud-upload-alt"></i>
-            </div>
-            <div class="logo-text">
-                <h2>Cloud Data Safety</h2>
-                <p>Warung Geprek Londho</p>
-            </div>
+            <div class="logo-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="logo-text"><h2>Cloud Data Safety</h2><p>Warung Geprek Londho</p></div>
         </div>
         <div class="nav-actions">
-            <button class="pdf-btn" onclick="exportToPDF()">
-                <i class="fas fa-file-pdf"></i> Cetak PDF
-            </button>
-            <button class="dark-toggle" onclick="toggleDarkMode()">
-                <i class="fas fa-moon"></i>
-            </button>
-            <button class="logout-btn" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+            <button class="pdf-btn" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Cetak PDF</button>
+            <button class="dark-toggle" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
     </nav>
 
     <div class="container" id="reportContent">
-        <!-- Header Laporan (untuk PDF) -->
-        <div id="pdfHeader" style="text-align: center; margin-bottom: 30px; padding: 20px; border-bottom: 2px solid #667eea; display: none;">
-            <h1 style="font-size: 28px; color: #667eea;">☁️ Cloud Data Safety</h1>
-            <h2 style="font-size: 20px; margin-top: 8px;">Warung Geprek "Geprek Londho"</h2>
-            <p style="margin-top: 8px;">Laporan Stok & Penjualan</p>
-            <p id="reportDate" style="color: #6b7280; margin-top: 4px;"></p>
+        <!-- ALERT STOK -->
+        <div id="stockAlert">
+            <div class="alert-content">
+                <span class="alert-icon">⚠️</span>
+                <div>
+                    <div class="alert-title">Stok Menipis!</div>
+                    <p class="alert-message" id="alertMessage">Beberapa menu hampir habis. Segera lakukan restok!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF Header -->
+        <div id="pdfHeader" style="text-align:center; margin-bottom:30px; padding:20px; border-bottom:2px solid #667eea; display:none;">
+            <h1 style="font-size:28px; color:#667eea;">☁️ Cloud Data Safety</h1>
+            <h2 style="font-size:20px; margin-top:8px;">Warung Geprek "Geprek Londho"</h2>
+            <p style="margin-top:8px;">Laporan Stok & Penjualan</p>
+            <p id="reportDate" style="color:#6b7280; margin-top:4px;"></p>
         </div>
 
         <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3><i class="fas fa-utensils"></i> Total Menu</h3>
-                    <div class="value" id="totalMenu">0</div>
-                </div>
-                <div class="stat-icon">
-                    <i class="fas fa-utensils"></i>
-                </div>
+                <div class="stat-info"><h3>Total Menu</h3><div class="value" id="totalMenu">0</div></div>
+                <div class="stat-icon"><i class="fas fa-utensils"></i></div>
             </div>
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3><i class="fas fa-boxes"></i> Total Stok</h3>
-                    <div class="value" id="totalStock">0</div>
-                </div>
-                <div class="stat-icon">
-                    <i class="fas fa-boxes"></i>
-                </div>
+                <div class="stat-info"><h3>Total Stok</h3><div class="value" id="totalStock">0</div></div>
+                <div class="stat-icon"><i class="fas fa-boxes"></i></div>
             </div>
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3><i class="fas fa-shopping-cart"></i> Transaksi Hari Ini</h3>
-                    <div class="value" id="todaySales">0</div>
-                </div>
-                <div class="stat-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
+                <div class="stat-info"><h3>Transaksi Hari Ini</h3><div class="value" id="todaySales">0</div></div>
+                <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
             </div>
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3><i class="fas fa-chart-line"></i> Total Penjualan</h3>
-                    <div class="value" id="totalSales">0</div>
-                </div>
-                <div class="stat-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
+                <div class="stat-info"><h3>Total Penjualan</h3><div class="value" id="totalSales">0</div></div>
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
             </div>
         </div>
 
@@ -532,9 +328,7 @@
                 <input type="text" id="menuName" placeholder="Nama Menu">
                 <input type="number" id="menuStock" placeholder="Stok">
                 <input type="number" id="menuPrice" placeholder="Harga">
-                <button class="btn-primary" onclick="addMenu()">
-                    <i class="fas fa-save"></i> Simpan
-                </button>
+                <button class="btn-primary" onclick="addMenu()"><i class="fas fa-save"></i> Simpan</button>
             </div>
         </div>
 
@@ -545,10 +339,8 @@
                 <input type="text" class="search-input" id="searchStock" placeholder="🔍 Cari menu..." onkeyup="filterStock()">
             </div>
             <div class="table-wrapper">
-                <table id="stockTable">
-                    <thead>
-                        <tr><th>Menu</th><th>Stok</th><th>Harga</th><th>Status</th><th>Aksi</th></tr>
-                    </thead>
+                <table>
+                    <thead><tr><th>Menu</th><th>Stok</th><th>Harga</th><th>Status</th><th>Aksi</th></tr></thead>
                     <tbody id="stockBody"></tbody>
                 </table>
             </div>
@@ -560,7 +352,7 @@
                 <h2><i class="fas fa-chart-line"></i> Data Penjualan</h2>
             </div>
             <div class="table-wrapper">
-                <table id="salesTable">
+                <table>
                     <thead><tr><th>Menu</th><th>Jumlah</th><th>Total</th><th>Waktu</th></tr></thead>
                     <tbody id="salesBody"></tbody>
                 </table>
@@ -576,34 +368,52 @@
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast-notif ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-exclamation-circle';
             toast.innerHTML = `
-                <div class="toast-icon">
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                </div>
+                <div class="toast-icon"><i class="fas ${icon}"></i></div>
                 <div class="toast-message">${message}</div>
             `;
             document.body.appendChild(toast);
             setTimeout(() => {
                 toast.classList.add('hide');
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, 4000);
         }
 
-        // Export to PDF
+        // Update stock alert
+        function updateStockAlert() {
+            const alertDiv = document.getElementById('stockAlert');
+            const alertMsg = document.getElementById('alertMessage');
+            const emptyStock = currentData.menus.filter(m => m.stock === 0);
+            const lowStock = currentData.menus.filter(m => m.stock > 0 && m.stock <= 10);
+            
+            if (emptyStock.length > 0) {
+                alertDiv.className = 'danger';
+                alertDiv.style.display = 'block';
+                const names = emptyStock.map(m => m.name).join(', ');
+                alertMsg.textContent = `⚠️ ${emptyStock.length} menu HABIS: ${names}. Segera restok!`;
+                showToast(`🚨 ${emptyStock.length} menu habis!`, 'error');
+            } else if (lowStock.length > 0) {
+                alertDiv.className = 'warning';
+                alertDiv.style.display = 'block';
+                const names = lowStock.map(m => m.name).join(', ');
+                alertMsg.textContent = `⚠️ ${lowStock.length} menu menipis: ${names}. Segera restok!`;
+                showToast(`⚠️ ${lowStock.length} menu menipis!`, 'warning');
+            } else {
+                alertDiv.style.display = 'none';
+            }
+        }
+
+        // Export PDF
         async function exportToPDF() {
             showToast('Menyiapkan laporan PDF...', 'success');
-            
-            // Tampilkan header PDF
             const pdfHeader = document.getElementById('pdfHeader');
             const reportDate = document.getElementById('reportDate');
             const now = new Date();
             reportDate.textContent = `Tanggal: ${now.toLocaleDateString('id-ID')} | Waktu: ${now.toLocaleTimeString('id-ID')}`;
             pdfHeader.style.display = 'block';
             
-            // Elemen yang akan di-PDF
             const element = document.getElementById('reportContent');
-            
-            // Konfigurasi PDF
             const opt = {
                 margin: [10, 10, 10, 10],
                 filename: `laporan_geprek_londho_${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}.pdf`,
@@ -618,8 +428,6 @@
             } catch (err) {
                 showToast('Gagal membuat PDF', 'error');
             }
-            
-            // Sembunyikan header lagi
             pdfHeader.style.display = 'none';
         }
 
@@ -629,13 +437,13 @@
             updateStats();
             displayStock();
             displaySales();
+            updateStockAlert();
         }
 
         function updateStats() {
             document.getElementById('totalMenu').textContent = currentData.menus.length;
             const totalStock = currentData.menus.reduce((sum, m) => sum + m.stock, 0);
             document.getElementById('totalStock').textContent = totalStock;
-            
             const today = new Date().toDateString();
             const todayTrans = currentData.transactions.filter(t => new Date(t.time).toDateString() === today);
             document.getElementById('todaySales').textContent = todayTrans.length;
@@ -650,12 +458,15 @@
             const tbody = document.getElementById('stockBody');
             tbody.innerHTML = '';
             filtered.forEach(menu => {
-                const status = menu.stock <= 10 ? '<span class="badge badge-warning" style="background:#f59e0b20;color:#f59e0b;">⚠️ Menipis</span>' : '<span class="badge badge-success">✅ Aman</span>';
+                let badge = '';
+                if (menu.stock === 0) badge = '<span class="badge badge-danger">🔴 HABIS</span>';
+                else if (menu.stock <= 10) badge = '<span class="badge badge-warning">🟡 Menipis</span>';
+                else badge = '<span class="badge badge-success">🟢 Aman</span>';
                 const row = tbody.insertRow();
                 row.insertCell(0).textContent = menu.name;
                 row.insertCell(1).textContent = menu.stock;
                 row.insertCell(2).textContent = `Rp ${menu.price.toLocaleString()}`;
-                row.insertCell(3).innerHTML = status;
+                row.insertCell(3).innerHTML = badge;
                 row.insertCell(4).innerHTML = `<button class="stock-btn" onclick="updateStock(${menu.id})"><i class="fas fa-edit"></i> Update</button>`;
             });
         }
@@ -703,7 +514,7 @@
 
         async function updateStock(menuId) {
             const newStock = prompt('Masukkan stok baru:');
-            if (newStock !== null) {
+            if (newStock !== null && !isNaN(newStock) && parseInt(newStock) >= 0) {
                 await fetch('/api/updatestock', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -711,6 +522,8 @@
                 });
                 showToast('Stok berhasil diupdate!', 'success');
                 loadData();
+            } else if (newStock !== null) {
+                showToast('Masukkan angka yang valid!', 'error');
             }
         }
 
@@ -725,16 +538,9 @@
             showToast(`Mode ${document.body.classList.contains('dark') ? 'gelap' : 'terang'} aktif`, 'success');
         }
 
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark');
-        }
-
-        if (localStorage.getItem('role') !== 'owner') {
-            window.location.href = 'index.html';
-        } else {
-            loadData();
-            setInterval(loadData, 10000);
-        }
+        if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
+        if (localStorage.getItem('role') !== 'owner') window.location.href = 'index.html';
+        else { loadData(); setInterval(loadData, 10000); }
     </script>
 </body>
 </html>

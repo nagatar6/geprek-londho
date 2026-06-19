@@ -458,7 +458,7 @@
                     
                     showToast(`Halo ${result.role === 'owner' ? 'Owner' : 'Karyawan'}, login berhasil!`, 'success');
                     
-                    const redirectUrl = result.role === 'owner' ? 'dashboard-owner.html' : 'dashboard-karyawan.html';
+                    const redirectUrl = result.role === 'owner' ? '/dashboard-owner' : '/dashboard-karyawan';
                     showSuccessModal(`Selamat datang ${result.role === 'owner' ? 'Owner' : 'Karyawan'}!`, redirectUrl);
                 } else {
                     loginBtn.innerHTML = originalText;

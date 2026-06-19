@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard - Cloud Data Safety</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: url('https://images.pexels.com/photos/28041446/pexels-photo-28041446.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: -1;
+        }
+        body.dark::before { background: rgba(0, 0, 0, 0.75); }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        body.dark .navbar { background: rgba(31, 41, 55, 0.95); }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i { color: white; font-size: 20px; }
+        .logo-text h2 { font-size: 18px; font-weight: 600; color: #1f2937; }
+        body.dark .logo-text h2 { color: #f3f4f6; }
+        .logo-text p { font-size: 12px; color: #6b7280; }
+
+        .nav-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .dark-toggle, .logout-btn, .pdf-btn {
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .dark-toggle { background: #e5e7eb; color: #374151; font-size: 20px; padding: 8px 12px; }
+        body.dark .dark-toggle { background: #374151; color: #f3f4f6; }
+        .pdf-btn { background: #dc2626; color: white; display: flex; align-items: center; gap: 8px; }
+        .pdf-btn:hover { background: #b91c1c; transform: translateY(-2px); }
+        .logout-btn { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; display: flex; align-items: center; gap: 8px; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+
+        /* STOCK NOTIFICATION AREA */
+        .stock-notification {
+            margin-bottom: 24px;
+        }
+        .stock-notification .alert {
+            padding: 12px 18px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .stock-notification .alert-danger {
+            border-left: 6px solid #dc3545;
+            color: #721c24;
+        }
+        .stock-notification .alert-warning {
+            border-left: 6px solid #ffc107;
+            color: #856404;
+        }
+        .stock-notification .alert-success {
+            border-left: 6px solid #28a745;
+            color: #155724;
+        }
+        .stock-notification .alert i {
+            font-size: 20px;
+        }
+        .stock-notification .alert strong {
+            font-weight: 600;
+        }
+        body.dark .stock-notification .alert {
+            background: rgba(30, 30, 40, 0.95);
+            color: #f0f0f0;
+        }
+
+        #stockAlert {
+            display: none;
+            border-radius: 16px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            animation: slideDown 0.4s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #stockAlert.danger { background: #fee2e2; border-left: 4px solid #dc2626; }
+        #stockAlert.warning { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .alert-content { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .alert-icon { font-size: 24px; }
+        .alert-title { font-weight: 600; }
+        #stockAlert.danger .alert-title { color: #dc2626; }
+        #stockAlert.warning .alert-title { color: #f59e0b; }
+        .alert-message { color: #6b7280; margin: 0; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        body.dark .stat-card { background: rgba(31, 41, 55, 0.95); }
+        .stat-card:hover { transform: translateY(-4px); }
+        .stat-info h3 { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+        .stat-info .value { font-size: 28px; font-weight: 700; color: #1f2937; }
+        body.dark .stat-info .value { color: #f3f4f6; }
+        .stat-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stat-icon i { font-size: 24px; color: #667eea; }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        body.dark .card { background: rgba(31, 41, 55, 0.95); }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .card-header h2 { font-size: 20px; font-weight: 600; color: #1f2937; }
+        body.dark .card-header h2 { color: #f3f4f6; }
+        .card-header i { color: #667eea; margin-right: 8px; }
+
+        .form-group { display: flex; gap: 16px; flex-wrap: wrap; }
+        .form-group input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+        }
+        body.dark .form-group input { background: #374151; border-color: #4b5563; color: #f3f4f6; }
+        .form-group input:focus { outline: none; border-color: #667eea; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+
+        .stock-btn {
+            background: #10b981;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        .stock-btn:hover { background: #059669; }
+
+        .badge-success { background: #10b98120; color: #10b981; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-warning { background: #f59e0b20; color: #f59e0b; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-danger { background: #dc262620; color: #dc2626; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        body.dark th, body.dark td { border-bottom-color: #374151; color: #f3f4f6; }
+        th { font-weight: 600; color: #6b7280; font-size: 13px; }
+
+        .search-input {
+            padding: 10px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            width: 250px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+        }
+        body.dark .search-input { background: #374151; border-color: #4b5563; color: #f3f4f6; }
+
+        /* TOAST NOTIF DI BAWAH */
+        .toast-notif {
+            position: fixed !important;
+            bottom: 30px !important;
+            right: 20px !important;
+            top: auto !important;
+            left: auto !important;
+            background: white;
+            border-radius: 16px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            max-width: 90%;
+        }
+        .toast-notif.success { border-left: 4px solid #10b981; }
+        .toast-notif.error { border-left: 4px solid #dc2626; }
+        .toast-notif.warning { border-left: 4px solid #f59e0b; }
+        .toast-notif .toast-icon {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toast-notif.success .toast-icon { background: #10b98120; color: #10b981; }
+        .toast-notif.error .toast-icon { background: #dc262620; color: #dc2626; }
+        .toast-notif.warning .toast-icon { background: #f59e0b20; color: #f59e0b; }
+        .toast-notif .toast-message { font-size: 14px; font-weight: 500; color: #1f2937; }
+        body.dark .toast-notif { background: #1f2937; }
+        body.dark .toast-notif .toast-message { color: #f3f4f6; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        .toast-notif.hide { animation: slideOut 0.3s ease forwards; }
+
+        @media (max-width: 768px) {
+            .container { padding: 16px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .form-group { flex-direction: column; }
+            .search-input { width: 100%; }
+            .toast-notif { bottom: 10px; right: 10px; left: 10px; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="logo-text"><h2>Cloud Data Safety</h2><p>Warung Geprek Londho</p></div>
+        </div>
+        <div class="nav-actions">
+            <button class="pdf-btn" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Cetak PDF</button>
+            <button class="dark-toggle" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </nav>
+
+    <div class="container" id="reportContent">
+
+        <!-- STOCK NOTIFICATION AREA -->
+        <div id="stockNotification" class="stock-notification"></div>
+
+        <div id="pdfHeader" style="text-align:center; margin-bottom:30px; padding:20px; border-bottom:2px solid #667eea; display:none;">
+            <h1 style="font-size:28px; color:#667eea;">☁️ Cloud Data Safety</h1>
+            <h2 style="font-size:20px; margin-top:8px;">Warung Geprek "Geprek Londho"</h2>
+            <p style="margin-top:8px;">Laporan Stok & Penjualan</p>
+            <p id="reportDate" style="color:#6b7280; margin-top:4px;"></p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info"><h3>Total Menu</h3><div class="value" id="totalMenu">0</div></div>
+                <div class="stat-icon"><i class="fas fa-utensils"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info"><h3>Total Stok</h3><div class="value" id="totalStock">0</div></div>
+                <div class="stat-icon"><i class="fas fa-boxes"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info"><h3>Transaksi Hari Ini</h3><div class="value" id="todaySales">0</div></div>
+                <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info"><h3>Total Penjualan</h3><div class="value" id="totalSales">0</div></div>
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-plus-circle"></i> Tambah Menu Baru</h2>
+            </div>
+            <div class="form-group">
+                <input type="text" id="menuName" placeholder="Nama Menu">
+                <input type="number" id="menuStock" placeholder="Stok">
+                <input type="number" id="menuPrice" placeholder="Harga">
+                <button class="btn-primary" onclick="addMenu()"><i class="fas fa-save"></i> Simpan</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-boxes"></i> Manajemen Stok</h2>
+                <input type="text" class="search-input" id="searchStock" placeholder="🔍 Cari menu..." onkeyup="filterStock()">
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Menu</th><th>Stok</th><th>Harga</th><th>Status</th><th>Aksi</th></tr></thead>
+                    <tbody id="stockBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-line"></i> Data Penjualan</h2>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Menu</th><th>Jumlah</th><th>Total</th><th>Waktu</th></tr></thead>
+                    <tbody id="salesBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentData = {};
+        let stockFilter = '';
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast-notif ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-exclamation-circle';
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fas ${icon}"></i></div>
+                <div class="toast-message">${message}</div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // SHOW STOCK NOTIFICATION (di area dashboard, bukan pop-up spam)
+        function showStockNotification() {
+            const container = document.getElementById('stockNotification');
+            if (!container) return;
+            container.innerHTML = '';
+            if (!currentData.menus) return;
+
+            const emptyStock = currentData.menus.filter(m => m.stock === 0);
+            const lowStock = currentData.menus.filter(m => m.stock > 0 && m.stock <= 10);
+
+            if (emptyStock.length > 0) {
+                const warning = document.createElement('div');
+                warning.className = 'alert alert-danger';
+                warning.innerHTML = `
+                    <i class="fas fa-times-circle"></i>
+                    <strong>${emptyStock.length} menu HABIS!</strong>
+                    <span>${emptyStock.map(m => m.name).join(', ')}</span>
+                `;
+                container.appendChild(warning);
+            }
+
+            if (lowStock.length > 0) {
+                const warning = document.createElement('div');
+                warning.className = 'alert alert-warning';
+                warning.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>${lowStock.length} menu MENIPIS!</strong>
+                    <span>${lowStock.map(m => m.name).join(', ')}</span>
+                `;
+                container.appendChild(warning);
+            }
+
+            if (emptyStock.length === 0 && lowStock.length === 0) {
+                const info = document.createElement('div');
+                info.className = 'alert alert-success';
+                info.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Semua stok aman.</strong>
+                `;
+                container.appendChild(info);
+            }
+        }
+
+        async function exportToPDF() {
+            showToast('Menyiapkan laporan PDF...', 'success');
+            const pdfHeader = document.getElementById('pdfHeader');
+            const reportDate = document.getElementById('reportDate');
+            const now = new Date();
+            reportDate.textContent = `Tanggal: ${now.toLocaleDateString('id-ID')} | Waktu: ${now.toLocaleTimeString('id-ID')}`;
+            pdfHeader.style.display = 'block';
+            const element = document.getElementById('reportContent');
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `laporan_geprek_londho_${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            try {
+                await html2pdf().set(opt).from(element).save();
+                showToast('Laporan PDF berhasil diunduh!', 'success');
+            } catch (err) {
+                showToast('Gagal membuat PDF', 'error');
+            }
+            pdfHeader.style.display = 'none';
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch('/api/data');
+                currentData = await res.json();
+                updateStats();
+                displayStock();
+                displaySales();
+                showStockNotification(); // Tampilkan notifikasi stok di dashboard
+            } catch (err) {
+                console.error('Gagal load data:', err);
+                showToast('Gagal memuat data', 'error');
+            }
+        }
+
+        function updateStats() {
+            if (!currentData.menus) return;
+            document.getElementById('totalMenu').textContent = currentData.menus.length;
+            const totalStock = currentData.menus.reduce((sum, m) => sum + m.stock, 0);
+            document.getElementById('totalStock').textContent = totalStock;
+            const today = new Date().toDateString();
+            const todayTrans = currentData.transactions.filter(t => new Date(t.time).toDateString() === today);
+            document.getElementById('todaySales').textContent = todayTrans.length;
+            document.getElementById('totalSales').textContent = currentData.transactions.length;
+        }
+
+        function displayStock() {
+            const tbody = document.getElementById('stockBody');
+            tbody.innerHTML = '';
+            if (!currentData.menus) return;
+            
+            let filtered = currentData.menus;
+            if (stockFilter) {
+                filtered = filtered.filter(m => m.name.toLowerCase().includes(stockFilter.toLowerCase()));
+            }
+            
+            filtered.forEach(menu => {
+                let badge = '';
+                if (menu.stock === 0) badge = '<span class="badge-danger">🔴 HABIS</span>';
+                else if (menu.stock <= 10) badge = '<span class="badge-warning">🟡 Menipis</span>';
+                else badge = '<span class="badge-success">🟢 Aman</span>';
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = menu.name || 'Menu';
+                row.insertCell(1).textContent = menu.stock || 0;
+                row.insertCell(2).textContent = `Rp ${(menu.price || 0).toLocaleString()}`;
+                row.insertCell(3).innerHTML = badge;
+                row.insertCell(4).innerHTML = `<button class="stock-btn" onclick="updateStock(${menu.id})"><i class="fas fa-edit"></i> Update</button>`;
+            });
+        }
+
+        function displaySales() {
+            const tbody = document.getElementById('salesBody');
+            tbody.innerHTML = '';
+            if (!currentData.transactions) return;
+            
+            const reversed = [...currentData.transactions].reverse();
+            reversed.slice(0, 50).forEach(t => {
+                const menu = currentData.menus.find(m => m.id === t.menuId);
+                if (menu) {
+                    const row = tbody.insertRow();
+                    row.insertCell(0).textContent = menu.name || 'Menu';
+                    row.insertCell(1).textContent = t.qty || 0;
+                    row.insertCell(2).textContent = `Rp ${((menu.price || 0) * (t.qty || 0)).toLocaleString()}`;
+                    row.insertCell(3).textContent = new Date(t.time).toLocaleString();
+                }
+            });
+        }
+
+        function filterStock() {
+            stockFilter = document.getElementById('searchStock').value;
+            displayStock();
+        }
+
+        async function addMenu() {
+            const name = document.getElementById('menuName').value;
+            const stock = document.getElementById('menuStock').value;
+            const price = document.getElementById('menuPrice').value;
+            if (!name || !stock || !price) {
+                showToast('Isi semua field!', 'error');
+                return;
+            }
+            await fetch('/api/menu', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, stock: parseInt(stock), price: parseInt(price) })
+            });
+            showToast('Menu berhasil ditambahkan!', 'success');
+            document.getElementById('menuName').value = '';
+            document.getElementById('menuStock').value = '';
+            document.getElementById('menuPrice').value = '';
+            loadData();
+        }
+
+        async function updateStock(menuId) {
+            const newStock = prompt('Masukkan stok baru:');
+            if (newStock !== null && !isNaN(newStock) && parseInt(newStock) >= 0) {
+                await fetch('/api/updatestock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ menuId, newStock: parseInt(newStock) })
+                });
+                showToast('Stok berhasil diupdate!', 'success');
+                loadData();
+            } else if (newStock !== null) {
+                showToast('Masukkan angka yang valid!', 'error');
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+            showToast(`Mode ${document.body.classList.contains('dark') ? 'gelap' : 'terang'} aktif`, 'success');
+        }
+
+        // INIT
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark');
+        }
+        if (localStorage.getItem('role') !== 'owner') {
+            window.location.href = 'index.html';
+        } else {
+            loadData();
+            // refresh setiap 30 detik
+            setInterval(loadData, 30000);
+        }
+    </script>
+</body>
+</html>

@@ -17,7 +17,6 @@
             transition: all 0.3s ease;
         }
         
-        /* Overlay gelap biar teks jelas */
         body::before {
             content: '';
             position: fixed;
@@ -81,7 +80,6 @@
         
         .container { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
         
-        /* Alert Stok */
         #stockAlert {
             display: none;
             border-radius: 16px;
@@ -191,7 +189,6 @@
         .badge-warning { background: #f59e0b20; color: #f59e0b; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .badge-danger { background: #dc262620; color: #dc2626; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         
-        /* Toast */
         .toast-notif {
             position: fixed;
             top: 20px;
@@ -252,7 +249,6 @@
     </nav>
 
     <div class="container">
-        <!-- ALERT STOK -->
         <div id="stockAlert">
             <div class="alert-content">
                 <span class="alert-icon">⚠️</span>
@@ -300,8 +296,8 @@
 
     <script>
         let currentData = {};
+        let selectedMenuId = '';
 
-        // Toast notification
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast-notif ${type}`;
@@ -317,7 +313,6 @@
             }, 4000);
         }
 
-        // Alert stok untuk karyawan
         function updateStockAlert() {
             const alertDiv = document.getElementById('stockAlert');
             const alertMsg = document.getElementById('alertMessage');
@@ -342,13 +337,17 @@
         }
 
         async function loadData() {
-            const res = await fetch('/api/data');
-            currentData = await res.json();
-            updateStats();
-            loadMenuSelect();
-            displayStock();
-            displayTodayTransactions();
-            updateStockAlert();
+            try {
+                const res = await fetch('/api/data');
+                currentData = await res.json();
+                updateStats();
+                loadMenuSelect();
+                displayStock();
+                displayTodayTransactions();
+                updateStockAlert();
+            } catch (err) {
+                console.error('Gagal load data:', err);
+            }
         }
 
         function updateStats() {
@@ -362,6 +361,9 @@
 
         function loadMenuSelect() {
             const select = document.getElementById('menuSelect');
+            // Simpan pilihan sebelumnya
+            const currentValue = select.value;
+            
             select.innerHTML = '<option value="">Pilih Menu</option>';
             currentData.menus.forEach(menu => {
                 const option = document.createElement('option');
@@ -370,6 +372,14 @@
                 if (menu.stock <= 0) option.disabled = true;
                 select.appendChild(option);
             });
+            
+            // Kembalikan pilihan jika masih ada
+            if (currentValue) {
+                const exists = Array.from(select.options).some(opt => opt.value === currentValue);
+                if (exists && !select.querySelector(`option[value="${currentValue}"]`).disabled) {
+                    select.value = currentValue;
+                }
+            }
         }
 
         function displayStock() {
@@ -425,13 +435,15 @@
             if (result.success) {
                 showToast('✅ Transaksi berhasil disimpan!', 'success');
                 document.getElementById('qty').value = '';
-                loadData();
+                // Refresh data tanpa reset pilihan menu
+                await loadData();
             } else {
                 showToast(result.message, 'error');
             }
         }
 
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        
         function toggleDarkMode() {
             document.body.classList.toggle('dark');
             localStorage.setItem('darkMode', document.body.classList.contains('dark'));
@@ -439,8 +451,13 @@
         }
 
         if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
-        if (localStorage.getItem('role') !== 'karyawan') window.location.href = 'index.html';
-        else { loadData(); setInterval(loadData, 5000); }
+        if (localStorage.getItem('role') !== 'karyawan') {
+            window.location.href = 'index.html';
+        } else {
+            loadData();
+            // Refresh setiap 30 detik (ga ganggu pilihan menu)
+            setInterval(loadData, 30000);
+        }
     </script>
 </body>
 </html>

@@ -573,7 +573,7 @@
 
         function logout() {
             localStorage.clear();
-            window.location.href = 'index.html';
+            window.location.href = '/';
         }
 
         function toggleDarkMode() {
@@ -587,7 +587,7 @@
             document.body.classList.add('dark');
         }
         if (localStorage.getItem('role') !== 'owner') {
-            window.location.href = 'index.html';
+            window.location.href = '/';
         } else {
             loadData();
             // refresh setiap 30 detik

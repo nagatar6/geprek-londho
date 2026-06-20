@@ -14,15 +14,22 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-        }
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    background: url('/images/ayam-geprek.png') center center/cover no-repeat fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+}
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: -1;
+}
 
         .login-container {
             width: 100%;
@@ -57,7 +64,7 @@
         .logo-icon {
             width: 70px;
             height: 70px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
             border-radius: 20px;
             display: flex;
             align-items: center;
@@ -130,7 +137,7 @@
         .login-btn {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
             color: white;
             border: none;
             border-radius: 16px;
@@ -307,8 +314,9 @@
         }
 
         body.dark {
-            background: linear-gradient(135deg, #1e1b2e 0%, #2d1f3d 100%);
+
         }
+        
 
         body.dark .login-card {
             background: rgba(31, 41, 55, 0.95);
@@ -359,9 +367,9 @@
         <div class="login-card">
             <div class="logo">
                 <div class="logo-icon">
-                    <i class="fas fa-cloud-upload-alt"></i>
+                    <i class="fas fa-store"></i>
                 </div>
-                <h1>Cloud Data Safety</h1>
+                <h1>Sistem Manajemen Geprek Londho</h1>
                 <p class="subtitle">Warung Geprek "Geprek Londho"</p>
             </div>
 

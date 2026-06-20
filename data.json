@@ -11,32 +11,50 @@
       "role": "karyawan"
     }
   ],
-  "menus": [
-    {
-      "id": 1,
-      "name": "Ayam Geprek",
-      "stock": 0,
-      "price": 15000
-    },
-    {
-      "id": 2,
-      "name": "Es Teh",
-      "stock": 100,
-      "price": 5000
-    },
-    {
-      "id": 3,
-      "name": "Nasi Uduk",
-      "stock": 30,
-      "price": 8000
-    },
-    {
-      "id": 4,
-      "name": "Sambal",
-      "stock": 200,
-      "price": 2000
-    }
-  ],
+ "menus": [
+  {
+    "id": 1,
+    "name": "Geprek Original",
+    "stock": 20,
+    "price": 15000
+  },
+  {
+    "id": 2,
+    "name": "Geprek Keju",
+    "stock": 15,
+    "price": 18000
+  },
+  {
+    "id": 3,
+    "name": "Geprek Mozzarella",
+    "stock": 10,
+    "price": 22000
+  },
+  {
+    "id": 4,
+    "name": "Es Teh Jumbo",
+    "stock": 100,
+    "price": 5000
+  },
+  {
+    "id": 5,
+    "name": "Es Jeruk",
+    "stock": 50,
+    "price": 6000
+  },
+  {
+    "id": 6,
+    "name": "Nasi Tambah",
+    "stock": 80,
+    "price": 4000
+  },
+  {
+    "id": 7,
+    "name": "Sambal Extra",
+    "stock": 150,
+    "price": 3000
+  }
+],
   "transactions": [
     {
       "id": 1781875469945,
